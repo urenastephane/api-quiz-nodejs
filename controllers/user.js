@@ -28,7 +28,7 @@ exports.signup = (req, res, next) => {
 // VOIR COMMENT OBTENIR BEARER 
 
 //const fakeUser = { email: 'testuser@testmail.fr', password: 'qsd' };
-var secret = 'batslescouillesdu18@niqueSaRaceLaChauveDeMonZboub'
+var secret = 'secret'
 
 const expressJwt = require('express-jwt')
 

@@ -43,7 +43,7 @@ mongoose.connect('mongodb+srv://admin:admin@cluster0-fic1w.mongodb.net/test?retr
 //  ajouté après : gestion des sessions
 
 app.use(session({
-  secret: 'pipidechat',
+  secret: 'test',
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 60000, secure: false } //false car pas https
@@ -51,8 +51,8 @@ app.use(session({
 
 app.use(flash)
 
-//var secret = 'batslescouillesdu18@niqueSaRaceLaChauveDeMonZboub'
-//app.use(expressJwt({secret: secret, }).unless({path:['/login', '/signup', '/', '/loginProtected']}))
+var secret = 'secret'
+app.use(expressJwt({secret: secret, }).unless({path:['/login', '/signup', '/', '/loginProtected']}))
 
 
 /*

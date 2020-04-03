@@ -1,7 +1,7 @@
 
 const jwt = require('jsonwebtoken');
 
-var secret = 'batslescouillesdu18@niqueSaRaceLaChauveDeMonZboub'
+var secret = 'secret'
 
 
 module.exports = (req, res, next) => {

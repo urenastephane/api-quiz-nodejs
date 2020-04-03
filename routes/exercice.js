@@ -8,7 +8,7 @@ const exerciceCtrl = require('../controllers/exercice')
 const auth = require('../middlewares/auth');
 var jwt = require('express-jwt');
 
-var secret = 'batslescouillesdu18@niqueSaRaceLaChauveDeMonZboub'
+var secret = 'secret'
 
 
 // ------------ PROTECTED ROUTES FOR TEACHERS --------------------
@@ -22,7 +22,7 @@ router.post('/create_exercice', exerciceCtrl.createExercice);
 
 // READ LIST OF EXERCICES
 //router.get('/liste', exerciceCtrl.getAllExercices);
-router.get('/liste', auth, exerciceCtrl.getAllExercices);
+router.get('/liste', exerciceCtrl.getAllExercices);
 
 
 
