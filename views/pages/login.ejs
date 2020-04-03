@@ -1,0 +1,185 @@
+<%- include('header.ejs') %>
+
+
+		<div class="central">
+			<h1>TITRE</h1>
+			<br>
+			<div id="login">
+				<form>
+					<legend>Veuillez saisir vos identifiants</legend>
+					<label for="email">email</label>
+					<input type="text" name="email" id="email">
+					<label for="password">mot de passe</label>
+					<input type="password" name="password" id="password">
+					<button type="submit">connexion</button>
+				</form>
+			</div>
+            
+            <div id="profile" style="display:none">
+            <button id="disconnect"> déconnexion </button>
+                <button id="display-payload"> voir le payload</button>
+                <div id="decoded-payload"> </div>
+                <div>
+                    <a href="#" id="member-only"> member-only protected </a>
+                </div>
+            </div>
+		</div>
+        
+        <script>
+            // 1) action exécutée quand je rentre email et PWD => submit déclenche un evt => requête XHR post vers /loginProtected (qui n'affiche pas une page): c'est une route qui exécute un post pour loger un user en checkant ses infos, tout en lui créant un token renvoyé via res.json(myToken);
+            // on recupere le token que l'on place dans local storage
+
+            var form = document.querySelector('form');
+			form.addEventListener("submit", loginUser);	
+            
+            
+				
+            
+            function loginUser(event) {				
+                loginUserWithXHR(event);
+			}	
+			
+			function loginUserWithXHR(event) {	
+                // requete XHR exécutée mais sans avoir à  executer une action d'où le preventDefault
+				event.preventDefault();
+                console.log('loginUserWithXHR');		
+				// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", '/loginProtected', true);
+				//Send the proper header information along with the request
+				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xhr.onreadystatechange = function() {//Call a function when the state changes.
+					if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                        var token = xhr.response;
+                        localStorage.setItem('token', token)
+                        switchToLoggedInMode();
+						form.reset();
+					}
+				}
+                var email = document.getElementById('email').value;
+                var password = document.getElementById('password').value;
+                var payLoad = "email=" + email + "&" + "password=" + password;
+                
+                xhr.send(payLoad);
+
+            }
+        
+            
+            
+            //div gérant la partie du formulaire pour se logguer
+            var loginArea=document.querySelector('#login');
+                
+                
+            //PROFILE contient plusieurs boutons gérés selon la connexion ou déconnexion
+            var profileArea = document.querySelector('#profile');
+                
+            // 2) partie destinée à gérer l'affichage du formulaire de login
+            // si pas loggué, le form est visible
+            //sinon il disparait et laisse place au bouton deconnexion (dans la div d'id profile) avec le button "disconnect" et à 2 boutons: affichage du payload et du lien member only
+            
+            var connectionLinkArea= document.querySelector('#connectionLink');
+                
+            function switchToLoggedInMode() {
+                loginArea.style.display='none';
+                profileArea.style.display='block';
+                connectionLinkArea.innerHTML='<a href="login"> déconnexion</a>'
+            }  
+            
+            function switchToLoggedOutMode() {
+                loginArea.style.display='block';
+                profileArea.style.display='none';
+                connectionLinkArea.innerHTML='<a href="login"> connexion</a>'
+            } 
+            
+            function handleFormDisplay() {
+                    if (localStorage.getItem('token')) {
+                        switchToLoggedInMode();
+                        }
+                        else {
+                        switchToLoggedOutMode();
+                        }
+                }
+            
+            handleFormDisplay();
+            
+            
+            
+            
+            // 3) A) : gestion des evts liés au boutons de profil loggué
+            
+            // ICI GESTION DE L'AFFICHAGE DU PAYLOAD
+            var displayPayLoadBtn = document.querySelector('#display-payload');
+            
+             
+            
+            function parseJwt() {
+                var tokenFromStorage= localStorage.getItem('token');
+                if (tokenFromStorage) {
+                    var base64PayLoad= tokenFromStorage.split(".")[1];
+                    return JSON.parse(window.atob(base64PayLoad));
+                } else {
+                    return 'no token to parse';
+                }
+            }
+            
+            function displayPayLoad() {
+                var payload = parseJwt();
+                var decodedPayLoadDiv=document.querySelector('#decoded-payload');
+                decodedPayLoadDiv.innerHTML = '<p>'+JSON.stringify(payload) + '</p>';
+            }
+            
+            
+            displayPayLoadBtn.addEventListener('click', displayPayLoad); 
+                
+            
+            
+            
+            // 3) B) GESTION DES AUTRES BOUTONS (noms explicites)
+            
+            //gestion deconnexion
+            var disconnectBtn = document.querySelector('#disconnect');
+            
+             function disconnect() {
+                switchToLoggedOutMode();
+                localStorage.removeItem('token');
+            }
+            
+            disconnectBtn.addEventListener('click', disconnect);
+            
+            
+            
+            // 4) GESTION DU BEARER TOKEN via MEMBER ONLY
+            var memberOnly = document.querySelector('#member-only');
+            memberOnly.addEventListener('click', makeRequestWithToken);
+            
+            function makeRequestWithToken(evt) {
+                evt.preventDefault(); // pour ne pas exécuter une autre requete
+                var page = this.id;
+                var tokenFromStorage = localStorage.getItem('token');
+                var config = {};
+                
+                if (tokenFromStorage) {
+                    config.headers= {'Authorization': 'Bearer '+ JSON.parse(tokenFromStorage)};
+                    
+                }
+                
+                axios.get(
+                    'http://localhost:8080/'+page, 
+                    config
+                ).then (res => {
+                    console.log('success request with token');
+                    console.log(res);
+                }).catch(err => {
+                    console.error("makeRequestWithToken err" + err);
+                })
+                
+            }
+            
+
+</script>
+
+<%- include('footer.ejs') %>
+        
+<!--
+	</body>
+</html> -->

@@ -1,0 +1,163 @@
+<%- include('header.ejs') %>
+
+<h3> Liste des meveilleux exercices de l'espace </h3>
+
+    <div class="ui main container">
+<!-- en cas d'erreur -->
+<% if (locals.flash && locals.flash.error) { %>
+<div class="ui negative message">
+    <%= flash.error %></div>
+<% } %> 
+<!-- en cas de succes -->
+<% if (locals.flash && locals.flash.success) { %>
+<div class="ui positive message">
+    <%= flash.success %></div>
+<% } %>
+    </div>
+
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Titre</th>
+      <th>Énoncé</th>
+      <th>Identifiant</th>
+      <th>Selection</th>
+    </tr>
+  </thead>
+  <tbody>
+<% for (exercice of exercices) { %>
+    <tr>
+      <td><%= exercice.titre %></td>
+      <td><%= exercice.enonce %></td>
+      <td><%= exercice._id %></td>
+      <td class="selectable">
+        <a href="/liste/<%= exercice._id %>" class="ui primary button"> Sélectionner</a>
+      </td>
+    </tr>
+    <%  } %>
+  </tbody>
+</table>
+
+<script>
+    
+            var form = document.querySelector('form');
+			form.addEventListener("submit", loginUser);	
+            
+            var loginArea=document.querySelector('#login');
+            var profileArea = document.querySelector('#profile');
+            
+            var displayPayLoadBtn = document.querySelector('#display-payload');
+            displayPayLoadBtn.addEventListener('click', displayPayLoad);
+            
+            
+            var disconnectBtn = document.querySelector('#disconnect');
+            
+            disconnectBtn.addEventListener('click', disconnect);
+            var connectionLinkArea= document.querySelector('#connectionLink');
+            
+            var memberOnly = document.querySelector('#member-only');
+            memberOnly.addEventListener('click', makeRequestWithToken);
+            
+            function handleFormDisplay() {
+                    if (localStorage.getItem('token')) {
+                        switchToLoggedInMode();
+                        }
+                        else {
+                        switchToLoggedOutMode();
+                        }
+                }
+            
+            
+            handleFormDisplay();
+            
+			function loginUser(event) {				
+                loginUserWithXHR(event);
+			}	
+			
+			function loginUserWithXHR(event) {		
+				event.preventDefault();
+                console.log('loginUserWithXHR');		
+				// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", '/loginProtected', true);
+				//Send the proper header information along with the request
+				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xhr.onreadystatechange = function() {//Call a function when the state changes.
+					if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                        var token = xhr.response;
+                        localStorage.setItem('token', token)
+                        switchToLoggedInMode();
+						form.reset();
+					}
+				}
+                
+                
+                
+				var email = document.getElementById('email').value;
+				var password = document.getElementById('password').value;
+				var payLoad = "email=" + email + "&" + "password=" + password; 
+				xhr.send(payLoad); 	
+                
+                
+			}
+            
+            function switchToLoggedInMode() {
+                loginArea.style.display='none';
+                profileArea.style.display='block';
+                connectionLinkArea.innerHTML='<a href="login"> déconnexion</a>'
+            }  
+            
+            function switchToLoggedOutMode() {
+                loginArea.style.display='block';
+                profileArea.style.display='none';
+                connectionLinkArea.innerHTML='<a href="login"> connexion</a>'
+            } 
+            
+            function displayPayLoad() {
+                var payload = parseJwt();
+                var decodedPayLoadDiv=document.querySelector('#decoded-payload');
+                decodedPayLoadDiv.innerHTML = '<p>'+JSON.stringify(payload) + '</p>';
+            }
+            
+            function parseJwt() {
+                var tokenFromStorage= localStorage.getItem('token');
+                if (tokenFromStorage) {
+                    var base64PayLoad= tokenFromStorage.split(".")[1];
+                    return JSON.parse(window.atob(base64PayLoad));
+                } else {
+                    return 'no token to parse';
+                }
+            }
+            
+            
+            function disconnect() {
+                switchToLoggedOutMode();
+                localStorage.removeItem('token');
+            }
+            
+            function makeRequestWithToken(evt) {
+                evt.preventDefault(); // pour ne pas exécuter une autre requete
+                var page = this.id;
+                var tokenFromStorage = localStorage.getItem('token');
+                var config = {};
+                
+                if (tokenFromStorage) {
+                    config.headers= {'Authorization': 'Bearer '+ JSON.parse(tokenFromStorage)};
+                    
+                }
+                
+                axios.get(
+                    'http://localhost:8080/'+page, 
+                    config
+                ).then (res => {
+                    console.log('success request with token');
+                    console.log(res);
+                }).catch(err => {
+                    console.error("makeRequestWithToken err" + err);
+                })
+                
+            }
+    
+</script>
+
+<%- include('footer.ejs') %>

@@ -1,0 +1,51 @@
+<%- include('header.ejs') %>
+
+<h3> Bienvenue sur le createur de quiz mon <%=locals.test%> ;) </h3>
+    
+    <div class="ui main container">
+<!-- en cas d'erreur -->
+<% if (locals.flash && locals.flash.error) { %>
+<div class="ui negative message">
+    <%= flash.error %></div>
+<% } %> 
+<!-- en cas de succes -->
+<% if (locals.flash && locals.flash.success) { %>
+<div class="ui positive message">
+    <%= flash.success %></div>
+<% } %>
+    </div>
+
+<!-- FORMULAIRE -->
+<div id="global_form">
+<form action="/create_exercice" method="POST" class="ui form">
+  <div class="field">
+    <label>Titre de l'exercice</label>
+    <input type="text" name="titre" id="titre" placeholder="Titre">
+  </div>
+  <div class="field">
+    <label>Énoncé</label>
+    <textarea id="enonce" name="enonce"></textarea>
+  </div>
+<div class="two fields">
+    <div class="field">
+      <label>Réponse correcte</label>
+      <input placeholder="Entrer la réponse correcte" type="text" id="correct" name="correct">
+    </div>
+    <div class="field">
+      <label>Réponse fausse 1</label>
+      <input placeholder="Entrer une réponse fausse" type="text" id="false1" name="false1">
+    </div>
+    <div class="field">
+      <label>Réponse fausse 2</label>
+      <input placeholder="Entrer une réponse fausse" type="text" id="false2" name="false2">
+    </div>
+    <div class="field">
+      <label>Réponse fausse 3</label>
+      <input placeholder="Entrer une réponse fausse" type="text" id="false3" name="false3">
+    </div>
+  </div>
+  <button class="ui button" type="submit">Créer</button>
+</form>
+</div>
+
+<%- include('footer.ejs') %>

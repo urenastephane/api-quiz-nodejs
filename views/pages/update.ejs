@@ -1,0 +1,51 @@
+<%- include('header.ejs') %>
+
+<h3> Mise à jour de mon exercice: il s'agit du n° <%= exercice._id %> </h3>
+    
+    <div class="ui main container">
+<!-- en cas d'erreur -->
+<% if (locals.flash && locals.flash.error) { %>
+<div class="ui negative message">
+    <%= flash.error %></div>
+<% } %> 
+<!-- en cas de succes -->
+<% if (locals.flash && locals.flash.success) { %>
+<div class="ui positive message">
+    <%= flash.success %></div>
+<% } %>
+    </div>
+
+<!-- FORMULAIRE -->
+<div id="global_form">
+<form action="/update/<%= exercice._id %>" method="POST" class="ui form">
+  <div class="field">
+    <label>Titre de l'exercice</label>
+    <input type="text" name="title" id="title" value="<%= exercice.titre %>">
+  </div>
+  <div class="field">
+    <label>Énoncé</label>
+    <textarea id="ennonce" name="ennonce"><%=exercice.enonce%></textarea>
+  </div>
+<div class="two fields">
+    <div class="field">
+      <label>Réponse correcte</label>
+      <input value="<%= exercice.correct %>" type="text" id="correct" name="correct">
+    </div>
+    <div class="field">
+      <label>Réponse fausse 1</label>
+      <input value="<%= exercice.false1 %>" type="text" id="false1" name="false1">
+    </div>
+    <div class="field">
+      <label>Réponse fausse 2</label>
+      <input value="<%= exercice.false2 %>" type="text" id="false2" name="false2">
+    </div>
+    <div class="field">
+      <label>Réponse fausse 3</label>
+      <input value="<%= exercice.false3 %>" type="text" id="false3" name="false3">
+    </div>
+  </div>
+  <button class="ui button" type="submit">Modifier</button>
+</form>
+</div>
+
+<%- include('footer.ejs') %>

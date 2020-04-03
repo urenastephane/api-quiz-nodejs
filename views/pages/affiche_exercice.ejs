@@ -1,0 +1,43 @@
+<%- include('header.ejs') %>
+
+<h3> Voici l'exercice demandé </h3>
+
+<div class="ui items">
+  <div class="item">
+    <div class="content">
+      <a class="header"><%= exercice.titre %></a>
+      <div class="description">
+        <p><%= exercice.enonce %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="ui middle aligned selection list">
+  <div class="item">
+    <div class="content">
+      <div class="header">Bonne réponse: <%= exercice.correct %></div>
+    </div>
+  </div>
+  <div class="item">
+    <div class="content">
+      <div class="header">Première mauvaise réponse: <%= exercice.false1 %></div>
+    </div>
+  </div>
+  <div class="item">
+    <div class="content">
+      <div class="header">Seconde mauvaise réponse: <%= exercice.false2 %></div>
+    </div>
+  </div>
+    <div class="item">
+    <div class="content">
+      <div class="header">Troisième mauvaise réponse: <%= exercice.false3 %></div>
+    </div>
+  </div>
+</div>
+
+<a class="positive ui button" href="/go-to-update/<%= exercice._id %>"> Modifier </a>
+<a class="negative ui button" href="/suppression/<%= exercice._id %>" onclick="return confirm('Vous-êtes sûr?')"> Supprimer </a>
+
+<%- include('footer.ejs') %>
